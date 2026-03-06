@@ -18,11 +18,33 @@
       width: auto;
       height: auto;
     }
+    #muteBtn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
   </style>
 </head>
 <body>
-  <video autoplay loop muted playsinline>
+  <video id="vid" autoplay loop muted playsinline>
     <source src="https://cdn.shopify.com/videos/c/o/v/793e166fe6a341e986283fc4570a6bf6.mp4" type="video/mp4">
   </video>
+  <button id="muteBtn">🔇</button>
+  <script>
+    const btn = document.getElementById('muteBtn');
+    const vid = document.getElementById('vid');
+    btn.addEventListener('click', () => {
+      vid.muted = !vid.muted;
+      btn.textContent = vid.muted ? '🔇' : '🔊';
+    });
+  </script>
 </body>
 </html>
