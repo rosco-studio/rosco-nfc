@@ -24,63 +24,17 @@
     }
     video.oculto { display: none; }
 
-    /* ---------- CONTENEDOR DE CONTROLES ---------- */
+    /* ---------- LOS TRES CONTROLES, MISMO EJE ---------- */
     .controls {
       position: fixed;
       bottom: 28px;
-      left: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-    .controls-row {
-      width: 100%;
+      left: 18px;
+      right: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
-
-    /* ---------- BOTÓN CENTRAL: CAMBIAR DE OBRA ---------- */
-    .btn-swap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      height: 44px;
-      padding: 0 22px;
-      background: rgba(12, 12, 14, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 22px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: #e3e1d9;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    .btn-swap:active {
-      background: rgba(74, 111, 165, 0.3);
-      border-color: rgba(74, 111, 165, 0.5);
-    }
-    /* al estar en la obra 02, la flecha se pasa al otro lado */
-    .btn-swap.back { flex-direction: row-reverse; }
-
-    .swap-arrow {
-      font-size: 13px;
-      letter-spacing: 0;
-      opacity: 0.75;
-      transition: opacity 0.3s ease;
-    }
-    .btn-swap:active .swap-arrow { opacity: 1; }
 
     /* ---------- BOTÓN ROSCO.STUDIO ---------- */
     .btn-visit {
@@ -88,7 +42,7 @@
       align-items: center;
       justify-content: center;
       height: 44px;
-      padding: 0 20px;
+      padding: 0 18px;
       background: rgba(12, 12, 14, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 22px;
@@ -104,19 +58,66 @@
       transition: all 0.3s ease;
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     .btn-visit:active {
       background: rgba(74, 111, 165, 0.3);
       border-color: rgba(74, 111, 165, 0.5);
     }
 
+    /* ---------- BOTÓN CENTRAL: CAMBIAR DE OBRA ---------- */
+    .btn-swap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      height: 44px;
+      padding: 0 16px;
+      background: rgba(12, 12, 14, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 22px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #e3e1d9;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      flex-shrink: 0;
+      animation: aviso 2.2s ease-in-out 1.2s 2;
+    }
+    .btn-swap:active {
+      background: rgba(74, 111, 165, 0.3);
+      border-color: rgba(74, 111, 165, 0.5);
+      animation: none;
+    }
+    /* en la obra 02 la flecha se pasa al otro lado */
+    .btn-swap.back { flex-direction: row-reverse; }
+
+    .swap-arrow {
+      font-size: 13px;
+      letter-spacing: 0;
+      opacity: 0.8;
+    }
+
+    /* pulso discreto al abrir, para que se note que se puede picar */
+    @keyframes aviso {
+      0%, 100% { border-color: rgba(255, 255, 255, 0.22); }
+      50%      { border-color: rgba(74, 111, 165, 0.75); }
+    }
+
     /* ---------- TOGGLE DE SONIDO ---------- */
     .toggle-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       height: 44px;
-      padding: 0 6px 0 16px;
+      padding: 0 6px 0 14px;
       background: rgba(12, 12, 14, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 22px;
@@ -125,6 +126,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
       -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
     }
     .toggle-wrap:active {
       background: rgba(12, 12, 14, 0.85);
@@ -173,26 +175,33 @@
       transform: translateX(18px);
     }
 
-    /* ---------- PANTALLAS ANGOSTAS ---------- */
-    @media (max-width: 400px) {
-      .controls { left: 14px; right: 14px; }
-      .btn-visit, .toggle-label, .btn-swap { font-size: 9px; letter-spacing: 2px; }
-      .btn-visit { padding: 0 15px; }
-      .toggle-wrap { padding: 0 6px 0 13px; gap: 8px; }
+    /* ---------- PANTALLAS ANGOSTAS: que quepan los tres ---------- */
+    @media (max-width: 430px) {
+      .controls { left: 12px; right: 12px; gap: 6px; }
+      .btn-visit, .toggle-label, .btn-swap {
+        font-size: 9px;
+        letter-spacing: 1.8px;
+      }
+      .btn-visit  { padding: 0 13px; }
+      .btn-swap   { padding: 0 12px; gap: 7px; }
+      .toggle-wrap{ padding: 0 5px 0 11px; gap: 7px; }
+      .toggle-track { width: 40px; height: 24px; }
+      .toggle-thumb { width: 18px; height: 18px; }
+      .toggle-wrap.on .toggle-thumb { transform: translateX(16px); }
     }
   </style>
 </head>
 <body>
 
   <!-- ================================================================= -->
-  <!--  SRC 01   ←←←  ENLACE DEL VIDEO DE LA OBRA 01                     -->
+  <!--  SRC 01   <<<  ENLACE DEL VIDEO DE LA OBRA 01                     -->
   <!-- ================================================================= -->
   <video id="vid01" autoplay loop muted playsinline>
     <source src="https://cdn.shopify.com/videos/c/o/v/29a4c280134c46b0a724985a9eec2ba7.mov" type="video/mp4">
   </video>
 
   <!-- ================================================================= -->
-  <!--  SRC 02   ←←←  ENLACE DEL VIDEO DE LA OBRA 02                     -->
+  <!--  SRC 02   <<<  ENLACE DEL VIDEO DE LA OBRA 02                     -->
   <!--  preload="none" = no se descarga hasta que le piquen al botón     -->
   <!-- ================================================================= -->
   <video id="vid02" class="oculto" loop muted playsinline preload="none">
@@ -202,19 +211,18 @@
 
   <div class="controls">
 
+    <a href="https://rosco.studio/" target="_blank" class="btn-visit">Rosco.studio</a>
+
     <!-- BOTÓN CENTRAL: cambia entre obra 01 y obra 02 -->
-    <div class="btn-swap" id="swapBtn">
-      <span id="swapLabel">Obra 02</span>
+    <div class="btn-swap" id="swapBtn" aria-label="Cambiar de obra">
+      <span id="swapLabel">02</span>
       <span class="swap-arrow" id="swapArrow">&rarr;</span>
     </div>
 
-    <div class="controls-row">
-      <a href="https://rosco.studio/" target="_blank" class="btn-visit">Rosco.studio</a>
-      <div class="toggle-wrap" id="soundToggle">
-        <span class="toggle-label">Sonido</span>
-        <div class="toggle-track">
-          <div class="toggle-thumb"></div>
-        </div>
+    <div class="toggle-wrap" id="soundToggle">
+      <span class="toggle-label">Sonido</span>
+      <div class="toggle-track">
+        <div class="toggle-thumb"></div>
       </div>
     </div>
 
@@ -228,11 +236,11 @@
     const swapLabel = document.getElementById('swapLabel');
     const swapArrow = document.getElementById('swapArrow');
 
-    let enObra01 = true;
+    let enObra01  = true;
     let conSonido = false;
 
-    function actual()  { return enObra01 ? vid01 : vid02; }
-    function inactivo(){ return enObra01 ? vid02 : vid01; }
+    function actual()   { return enObra01 ? vid01 : vid02; }
+    function inactivo() { return enObra01 ? vid02 : vid01; }
 
     /* ---------- SONIDO ---------- */
     toggle.addEventListener('click', () => {
@@ -256,14 +264,15 @@
       entrando.play();
 
       enObra01 = !enObra01;
+      swapBtn.style.animation = 'none';
 
       // la flecha se pasa al otro lado, como un ir y venir
       if (enObra01) {
-        swapLabel.textContent = 'Obra 02';
+        swapLabel.textContent = '02';
         swapArrow.innerHTML   = '&rarr;';
         swapBtn.classList.remove('back');
       } else {
-        swapLabel.textContent = 'Obra 01';
+        swapLabel.textContent = '01';
         swapArrow.innerHTML   = '&larr;';
         swapBtn.classList.add('back');
       }
