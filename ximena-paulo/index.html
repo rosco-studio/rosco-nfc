@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rosco — Sonido:Viento en Pradera</title>
+  <title>Rosco — Ximena | Paulo</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,6 +14,7 @@
       align-items: center;
       height: 100vh;
       font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
     }
     video {
       max-height: 100vh;
@@ -21,18 +22,67 @@
       width: auto;
       height: auto;
     }
+    video.oculto { display: none; }
 
+    /* ---------- CONTENEDOR DE CONTROLES ---------- */
     .controls {
       position: fixed;
       bottom: 28px;
       left: 20px;
       right: 20px;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .controls-row {
+      width: 100%;
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
+    /* ---------- BOTÓN CENTRAL: CAMBIAR DE OBRA ---------- */
+    .btn-swap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 44px;
+      padding: 0 22px;
+      background: rgba(12, 12, 14, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 22px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #e3e1d9;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .btn-swap:active {
+      background: rgba(74, 111, 165, 0.3);
+      border-color: rgba(74, 111, 165, 0.5);
+    }
+    /* al estar en la obra 02, la flecha se pasa al otro lado */
+    .btn-swap.back { flex-direction: row-reverse; }
+
+    .swap-arrow {
+      font-size: 13px;
+      letter-spacing: 0;
+      opacity: 0.75;
+      transition: opacity 0.3s ease;
+    }
+    .btn-swap:active .swap-arrow { opacity: 1; }
+
+    /* ---------- BOTÓN ROSCO.STUDIO ---------- */
     .btn-visit {
       display: flex;
       align-items: center;
@@ -53,12 +103,14 @@
       text-decoration: none;
       transition: all 0.3s ease;
       cursor: pointer;
+      white-space: nowrap;
     }
     .btn-visit:active {
       background: rgba(74, 111, 165, 0.3);
       border-color: rgba(74, 111, 165, 0.5);
     }
 
+    /* ---------- TOGGLE DE SONIDO ---------- */
     .toggle-wrap {
       display: flex;
       align-items: center;
@@ -87,6 +139,7 @@
       text-transform: uppercase;
       transition: color 0.3s ease;
       user-select: none;
+      white-space: nowrap;
     }
     .toggle-wrap.on .toggle-label {
       color: #e3e1d9;
@@ -119,29 +172,101 @@
     .toggle-wrap.on .toggle-thumb {
       transform: translateX(18px);
     }
+
+    /* ---------- PANTALLAS ANGOSTAS ---------- */
+    @media (max-width: 400px) {
+      .controls { left: 14px; right: 14px; }
+      .btn-visit, .toggle-label, .btn-swap { font-size: 9px; letter-spacing: 2px; }
+      .btn-visit { padding: 0 15px; }
+      .toggle-wrap { padding: 0 6px 0 13px; gap: 8px; }
+    }
   </style>
 </head>
 <body>
-  <video id="vid" autoplay loop muted playsinline>
+
+  <!-- ================================================================= -->
+  <!--  SRC 01   ←←←  ENLACE DEL VIDEO DE LA OBRA 01                     -->
+  <!-- ================================================================= -->
+  <video id="vid01" autoplay loop muted playsinline>
     <source src="https://cdn.shopify.com/videos/c/o/v/29a4c280134c46b0a724985a9eec2ba7.mov" type="video/mp4">
   </video>
 
+  <!-- ================================================================= -->
+  <!--  SRC 02   ←←←  ENLACE DEL VIDEO DE LA OBRA 02                     -->
+  <!--  preload="none" = no se descarga hasta que le piquen al botón     -->
+  <!-- ================================================================= -->
+  <video id="vid02" class="oculto" loop muted playsinline preload="none">
+    <source src="PEGA_AQUI_EL_ENLACE_DEL_VIDEO_02.mov" type="video/mp4">
+  </video>
+
+
   <div class="controls">
-    <a href="https://rosco.studio/" target="_blank" class="btn-visit">Rosco.studio</a>
-    <div class="toggle-wrap" id="soundToggle">
-      <span class="toggle-label">Sonido</span>
-      <div class="toggle-track">
-        <div class="toggle-thumb"></div>
+
+    <!-- BOTÓN CENTRAL: cambia entre obra 01 y obra 02 -->
+    <div class="btn-swap" id="swapBtn">
+      <span id="swapLabel">Obra 02</span>
+      <span class="swap-arrow" id="swapArrow">&rarr;</span>
+    </div>
+
+    <div class="controls-row">
+      <a href="https://rosco.studio/" target="_blank" class="btn-visit">Rosco.studio</a>
+      <div class="toggle-wrap" id="soundToggle">
+        <span class="toggle-label">Sonido</span>
+        <div class="toggle-track">
+          <div class="toggle-thumb"></div>
+        </div>
       </div>
     </div>
+
   </div>
 
   <script>
-    const toggle = document.getElementById('soundToggle');
-    const vid = document.getElementById('vid');
+    const vid01     = document.getElementById('vid01');
+    const vid02     = document.getElementById('vid02');
+    const toggle    = document.getElementById('soundToggle');
+    const swapBtn   = document.getElementById('swapBtn');
+    const swapLabel = document.getElementById('swapLabel');
+    const swapArrow = document.getElementById('swapArrow');
+
+    let enObra01 = true;
+    let conSonido = false;
+
+    function actual()  { return enObra01 ? vid01 : vid02; }
+    function inactivo(){ return enObra01 ? vid02 : vid01; }
+
+    /* ---------- SONIDO ---------- */
     toggle.addEventListener('click', () => {
-      vid.muted = !vid.muted;
-      toggle.classList.toggle('on', !vid.muted);
+      conSonido = !conSonido;
+      actual().muted = !conSonido;
+      toggle.classList.toggle('on', conSonido);
+    });
+
+    /* ---------- CAMBIAR DE OBRA ---------- */
+    swapBtn.addEventListener('click', () => {
+      const saliendo = actual();
+      const entrando = inactivo();
+
+      saliendo.pause();
+      saliendo.muted = true;
+      saliendo.classList.add('oculto');
+
+      entrando.classList.remove('oculto');
+      entrando.currentTime = 0;
+      entrando.muted = !conSonido;
+      entrando.play();
+
+      enObra01 = !enObra01;
+
+      // la flecha se pasa al otro lado, como un ir y venir
+      if (enObra01) {
+        swapLabel.textContent = 'Obra 02';
+        swapArrow.innerHTML   = '&rarr;';
+        swapBtn.classList.remove('back');
+      } else {
+        swapLabel.textContent = 'Obra 01';
+        swapArrow.innerHTML   = '&larr;';
+        swapBtn.classList.add('back');
+      }
     });
   </script>
 </body>
