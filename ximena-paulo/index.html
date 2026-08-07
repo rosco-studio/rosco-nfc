@@ -17,7 +17,7 @@
       overflow: hidden;
     }
 
-    /* los DOS videos viven siempre en pantalla, apilados.
+    /* los DOS videos viven siempre en el DOM, apilados.
        El oculto usa opacity, NO display:none, para no matar el buffer. */
     video {
       position: absolute;
@@ -231,11 +231,9 @@
 
   <!-- ================================================================= -->
   <!--  SRC 02   <<<  ENLACE DEL VIDEO DE LA OBRA 02                     -->
-  <!--  preload="metadata": se precarga completo por JS en cuanto        -->
-  <!--  el video 01 ya está corriendo, para que el cambio sea instantáneo -->
   <!-- ================================================================= -->
   <video id="vid02" class="oculto" loop muted playsinline preload="metadata">
-    <source src="https://cdn.shopify.com/videos/c/o/v/9dbafe987a304ed1a91c63ecf65c95af.mov"video/mp4">
+    <source src="PEGA_AQUI_EL_ENLACE_DEL_VIDEO_02.mov" type="video/mp4">
   </video>
 
   <div class="cargando" id="cargando"></div>
@@ -274,9 +272,8 @@
     function inactivo() { return enObra01 ? vid02 : vid01; }
 
     /* ---------- PRECARGA SECUENCIADA ----------
-       El 02 empieza a bajar en cuanto el 01 ya está reproduciendo.
-       Así no compiten por ancho de banda al abrir, y para cuando
-       el coleccionista le pique al botón, ya está bufereado.        */
+       El 02 empieza a bajar cuando el 01 ya está corriendo,
+       para que no compitan por ancho de banda al abrir.        */
     let yaPrecargado = false;
     function precargarSegundo() {
       if (yaPrecargado) return;
@@ -285,19 +282,16 @@
       vid02.load();
     }
     vid01.addEventListener('playing', precargarSegundo, { once: true });
-    // red de seguridad por si 'playing' no dispara
-    setTimeout(precargarSegundo, 3000);
+    setTimeout(precargarSegundo, 3000);   // red de seguridad
 
-    /* ---------- INDICADOR DE CARGA ---------- */
-    function mostrarCarga(){ cargando.classList.add('visible'); }
-    function ocultarCarga(){ cargando.classList.remove('visible'); }
-
-    [vid01, vid02].forEach(v => {
-      v.addEventListener('waiting',   () => { if (v === actual()) mostrarCarga(); });
-      v.addEventListener('stalled',   () => { if (v === actual()) mostrarCarga(); });
-      v.addEventListener('playing',   ocultarCarga);
-      v.addEventListener('canplay',   () => { if (v === actual()) ocultarCarga(); });
-    });
+    /* ---------- INDICADOR DE CARGA ----------
+       Lee el ESTADO REAL cada 300 ms en vez de acordarse de eventos.
+       Así es imposible que se quede prendido para siempre.      */
+    setInterval(() => {
+      const v = actual();
+      const corriendo = !v.paused && v.readyState >= 3;
+      cargando.classList.toggle('visible', !corriendo);
+    }, 300);
 
     /* ---------- SONIDO ---------- */
     toggle.addEventListener('click', () => {
@@ -315,22 +309,20 @@
       const saliendo = actual();
       const entrando = inactivo();
 
-      // si el que entra todavía no tiene suficiente buffer, avisamos
-      if (entrando.readyState < 3) mostrarCarga();
+      // el estado cambia PRIMERO, para que el indicador lea bien
+      enObra01 = !enObra01;
+
+      saliendo.muted = true;
+      saliendo.pause();
+      saliendo.classList.add('oculto');
 
       entrando.muted = !conSonido;
-      entrando.currentTime = 0;
-
+      entrando.classList.remove('oculto');
+      // NO se reinicia currentTime: forzar un seek en un archivo
+      // pesado sin faststart obliga a re-descargarlo entero.
       const arrancar = entrando.play();
       if (arrancar && arrancar.catch) arrancar.catch(() => {});
 
-      // el que sale se silencia y se apaga, pero NO se quita del DOM
-      saliendo.muted = true;
-      saliendo.classList.add('oculto');
-      entrando.classList.remove('oculto');
-      saliendo.pause();
-
-      enObra01 = !enObra01;
       swapBtn.style.animation = 'none';
 
       if (enObra01) {
