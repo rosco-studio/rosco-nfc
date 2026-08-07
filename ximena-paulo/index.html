@@ -16,13 +16,51 @@
       font-family: 'JetBrains Mono', monospace;
       overflow: hidden;
     }
+
+    /* los DOS videos viven siempre en pantalla, apilados.
+       El oculto usa opacity, NO display:none, para no matar el buffer. */
     video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       max-height: 100vh;
       max-width: 100%;
       width: auto;
       height: auto;
+      opacity: 1;
+      z-index: 1;
+      transition: opacity 0.25s ease;
     }
-    video.oculto { display: none; }
+    video.oculto {
+      opacity: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---------- INDICADOR DE CARGA ---------- */
+    .cargando {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e3e1d9;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      transition: opacity 0.2s ease;
+    }
+    .cargando.visible {
+      opacity: 1;
+      animation: latido 1.1s ease-in-out infinite;
+    }
+    @keyframes latido {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.7); opacity: 0.35; }
+      50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
 
     /* ---------- LOS TRES CONTROLES, MISMO EJE ---------- */
     .controls {
@@ -34,6 +72,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+      z-index: 10;
     }
 
     /* ---------- BOTÓN ROSCO.STUDIO ---------- */
@@ -96,7 +135,6 @@
       border-color: rgba(74, 111, 165, 0.5);
       animation: none;
     }
-    /* en la obra 02 la flecha se pasa al otro lado */
     .btn-swap.back { flex-direction: row-reverse; }
 
     .swap-arrow {
@@ -105,7 +143,6 @@
       opacity: 0.8;
     }
 
-    /* pulso discreto al abrir, para que se note que se puede picar */
     @keyframes aviso {
       0%, 100% { border-color: rgba(255, 255, 255, 0.22); }
       50%      { border-color: rgba(74, 111, 165, 0.75); }
@@ -128,9 +165,7 @@
       -webkit-tap-highlight-color: transparent;
       flex-shrink: 0;
     }
-    .toggle-wrap:active {
-      background: rgba(12, 12, 14, 0.85);
-    }
+    .toggle-wrap:active { background: rgba(12, 12, 14, 0.85); }
 
     .toggle-label {
       color: rgba(227, 225, 217, 0.45);
@@ -143,9 +178,7 @@
       user-select: none;
       white-space: nowrap;
     }
-    .toggle-wrap.on .toggle-label {
-      color: #e3e1d9;
-    }
+    .toggle-wrap.on .toggle-label { color: #e3e1d9; }
 
     .toggle-track {
       position: relative;
@@ -156,9 +189,7 @@
       transition: background 0.3s ease;
       flex-shrink: 0;
     }
-    .toggle-wrap.on .toggle-track {
-      background: #4a6fa5;
-    }
+    .toggle-wrap.on .toggle-track { background: #4a6fa5; }
 
     .toggle-thumb {
       position: absolute;
@@ -171,20 +202,18 @@
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
-    .toggle-wrap.on .toggle-thumb {
-      transform: translateX(18px);
-    }
+    .toggle-wrap.on .toggle-thumb { transform: translateX(18px); }
 
-    /* ---------- PANTALLAS ANGOSTAS: que quepan los tres ---------- */
+    /* ---------- PANTALLAS ANGOSTAS ---------- */
     @media (max-width: 430px) {
       .controls { left: 12px; right: 12px; gap: 6px; }
       .btn-visit, .toggle-label, .btn-swap {
         font-size: 9px;
         letter-spacing: 1.8px;
       }
-      .btn-visit  { padding: 0 13px; }
-      .btn-swap   { padding: 0 12px; gap: 7px; }
-      .toggle-wrap{ padding: 0 5px 0 11px; gap: 7px; }
+      .btn-visit   { padding: 0 13px; }
+      .btn-swap    { padding: 0 12px; gap: 7px; }
+      .toggle-wrap { padding: 0 5px 0 11px; gap: 7px; }
       .toggle-track { width: 40px; height: 24px; }
       .toggle-thumb { width: 18px; height: 18px; }
       .toggle-wrap.on .toggle-thumb { transform: translateX(16px); }
@@ -196,24 +225,25 @@
   <!-- ================================================================= -->
   <!--  SRC 01   <<<  ENLACE DEL VIDEO DE LA OBRA 01                     -->
   <!-- ================================================================= -->
-  <video id="vid01" autoplay loop muted playsinline>
+  <video id="vid01" autoplay loop muted playsinline preload="auto">
     <source src="https://cdn.shopify.com/videos/c/o/v/29a4c280134c46b0a724985a9eec2ba7.mov" type="video/mp4">
   </video>
 
   <!-- ================================================================= -->
   <!--  SRC 02   <<<  ENLACE DEL VIDEO DE LA OBRA 02                     -->
-  <!--  preload="none" = no se descarga hasta que le piquen al botón     -->
+  <!--  preload="metadata": se precarga completo por JS en cuanto        -->
+  <!--  el video 01 ya está corriendo, para que el cambio sea instantáneo -->
   <!-- ================================================================= -->
-  <video id="vid02" class="oculto" loop muted playsinline preload="none">
-    <source src="https://cdn.shopify.com/videos/c/o/v/9dbafe987a304ed1a91c63ecf65c95af.mov" type="video/mp4">
+  <video id="vid02" class="oculto" loop muted playsinline preload="metadata">
+    <source src="https://cdn.shopify.com/videos/c/o/v/9dbafe987a304ed1a91c63ecf65c95af.mov"video/mp4">
   </video>
 
+  <div class="cargando" id="cargando"></div>
 
   <div class="controls">
 
     <a href="https://rosco.studio/" target="_blank" class="btn-visit">Rosco.studio</a>
 
-    <!-- BOTÓN CENTRAL: cambia entre obra 01 y obra 02 -->
     <div class="btn-swap" id="swapBtn" aria-label="Cambiar de obra">
       <span id="swapLabel">02</span>
       <span class="swap-arrow" id="swapArrow">&rarr;</span>
@@ -235,12 +265,39 @@
     const swapBtn   = document.getElementById('swapBtn');
     const swapLabel = document.getElementById('swapLabel');
     const swapArrow = document.getElementById('swapArrow');
+    const cargando  = document.getElementById('cargando');
 
     let enObra01  = true;
     let conSonido = false;
 
     function actual()   { return enObra01 ? vid01 : vid02; }
     function inactivo() { return enObra01 ? vid02 : vid01; }
+
+    /* ---------- PRECARGA SECUENCIADA ----------
+       El 02 empieza a bajar en cuanto el 01 ya está reproduciendo.
+       Así no compiten por ancho de banda al abrir, y para cuando
+       el coleccionista le pique al botón, ya está bufereado.        */
+    let yaPrecargado = false;
+    function precargarSegundo() {
+      if (yaPrecargado) return;
+      yaPrecargado = true;
+      vid02.preload = 'auto';
+      vid02.load();
+    }
+    vid01.addEventListener('playing', precargarSegundo, { once: true });
+    // red de seguridad por si 'playing' no dispara
+    setTimeout(precargarSegundo, 3000);
+
+    /* ---------- INDICADOR DE CARGA ---------- */
+    function mostrarCarga(){ cargando.classList.add('visible'); }
+    function ocultarCarga(){ cargando.classList.remove('visible'); }
+
+    [vid01, vid02].forEach(v => {
+      v.addEventListener('waiting',   () => { if (v === actual()) mostrarCarga(); });
+      v.addEventListener('stalled',   () => { if (v === actual()) mostrarCarga(); });
+      v.addEventListener('playing',   ocultarCarga);
+      v.addEventListener('canplay',   () => { if (v === actual()) ocultarCarga(); });
+    });
 
     /* ---------- SONIDO ---------- */
     toggle.addEventListener('click', () => {
@@ -250,23 +307,32 @@
     });
 
     /* ---------- CAMBIAR DE OBRA ---------- */
+    let cambiando = false;
     swapBtn.addEventListener('click', () => {
+      if (cambiando) return;
+      cambiando = true;
+
       const saliendo = actual();
       const entrando = inactivo();
 
-      saliendo.pause();
+      // si el que entra todavía no tiene suficiente buffer, avisamos
+      if (entrando.readyState < 3) mostrarCarga();
+
+      entrando.muted = !conSonido;
+      entrando.currentTime = 0;
+
+      const arrancar = entrando.play();
+      if (arrancar && arrancar.catch) arrancar.catch(() => {});
+
+      // el que sale se silencia y se apaga, pero NO se quita del DOM
       saliendo.muted = true;
       saliendo.classList.add('oculto');
-
       entrando.classList.remove('oculto');
-      entrando.currentTime = 0;
-      entrando.muted = !conSonido;
-      entrando.play();
+      saliendo.pause();
 
       enObra01 = !enObra01;
       swapBtn.style.animation = 'none';
 
-      // la flecha se pasa al otro lado, como un ir y venir
       if (enObra01) {
         swapLabel.textContent = '02';
         swapArrow.innerHTML   = '&rarr;';
@@ -276,6 +342,8 @@
         swapArrow.innerHTML   = '&larr;';
         swapBtn.classList.add('back');
       }
+
+      setTimeout(() => { cambiando = false; }, 400);
     });
   </script>
 </body>
